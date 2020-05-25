@@ -19,5 +19,6 @@
     ],
 
     'data': [
+        'views/stock_picking_batch_views.xml',
     ]
 }
