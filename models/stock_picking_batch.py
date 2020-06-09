@@ -26,7 +26,7 @@ class StockPickingBatch(models.Model):
 
             # select only pickings that don't already have a delivery note
             # TODO state check on individual pickings?
-            pickings = self.mapped('picking_ids').search([('delivery_note_id', '=', False)])
+            pickings = self.mapped('picking_ids').search([('delivery_note_id', '=', False), ('batch_id', '=', rec.id)])
 
             # poor man's group by - group by homogeneous pickings
             todo_list = {}
