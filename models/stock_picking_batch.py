@@ -8,7 +8,7 @@ class StockPickingBatch(models.Model):
     _inherit = "stock.picking.batch"
 
     delivery_note_ids = fields.One2many(
-            'stock.delivery.note', 'parent_stock_picking_batch_id', string='Delivery Notes', copy=False)
+            'stock.delivery.note', 'stock_picking_batch_id', string='Delivery Notes', copy=False)
 
     delivery_note_count = fields.Integer(compute='_compute_delivery_note_count')
 
@@ -39,6 +39,6 @@ class StockPickingBatch(models.Model):
                     'partner_sender_id': partner_ids[0],
                     'partner_id': partner_ids[1],
                     'partner_shipping_id': partner_ids[1],
-                    'parent_stock_picking_batch_id': rec.id,
+                    'stock_picking_batch_id': rec.id,
                 })
                 pickings.write({'delivery_note_id': dn.id})
