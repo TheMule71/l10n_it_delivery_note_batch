@@ -18,7 +18,7 @@ class StockPickingBatch(models.Model):
             rec.delivery_note_count = len(rec.delivery_note_ids)
 
     @api.multi
-    def create_delivery_notes(self):
+    def create_delivery_notes(self, **kwargs):
         for rec in self:
             if rec.state != 'done':
                 # TODO check state - when are we allowed to create draft delivery notes?
@@ -42,3 +42,23 @@ class StockPickingBatch(models.Model):
                     'stock_picking_batch_id': rec.id,
                 })
                 pickings.write({'delivery_note_id': dn.id})
+
+        return self.goto_delivery_notes(**kwargs)
+
+    @api.multi
+    def goto_delivery_notes(self, **kwargs):
+        delivery_notes = self.mapped('delivery_note_ids')
+        action = self.env.ref('l10n_it_delivery_note.stock_delivery_note_action').read()[0]
+        action.update(kwargs)
+
+        if len(delivery_notes) > 1:
+            action['domain'] = [('id', 'in', delivery_notes.ids)]
+
+        elif len(delivery_notes) == 1:
+            action['views'] = [(self.env.ref('l10n_it_delivery_note.stock_delivery_note_form_view').id, 'form')]
+            action['res_id'] = delivery_notes.id
+
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+
+        return action
